@@ -1,18 +1,18 @@
-import admin from 'firebase-admin';
+const admin = require('firebase-admin');
 
-// Initialize Firebase Admin (only once)
-if (!admin.apps.length) {
+// Initialize Firebase Admin (Vercel serverless safe)
+if (admin.apps.length === 0) {
     admin.initializeApp({
         credential: admin.credential.cert({
             projectId: process.env.FIREBASE_PROJECT_ID,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
             clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
         }),
         databaseURL: "https://ai-perfect-tools-default-rtdb.asia-southeast1.firebasedatabase.app"
     });
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     // CORS headers
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'API key not configured' });
         }
 
-        const response = await fetch('https://api.perplexity.ai/chat/completions', {
+        const aiResponse = await fetch('https://api.perplexity.ai/chat/completions', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
@@ -80,12 +80,12 @@ export default async function handler(req, res) {
             })
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
+        if (!aiResponse.ok) {
+            const errorData = await aiResponse.json();
             throw new Error(errorData.error?.message || 'AI API error');
         }
 
-        const data = await response.json();
+        const data = await aiResponse.json();
 
         // Update user stats
         await userRef.update({
@@ -115,4 +115,4 @@ export default async function handler(req, res) {
             message: error.message 
         });
     }
-}
+};

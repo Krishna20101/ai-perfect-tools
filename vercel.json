@@ -15,11 +15,5 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "env": {
-    "FIREBASE_PROJECT_ID": "ai-perfect-tools",
-    "FIREBASE_CLIENT_EMAIL": "@firebase_client_email",
-    "FIREBASE_PRIVATE_KEY": "@firebase_private_key",
-    "PERPLEXITY_API_KEY": "@perplexity_api_key"
-  }
+  ]
 }

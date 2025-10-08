@@ -6,7 +6,7 @@
     <title>Perfect AI Tools - Free AI Tools Hub</title>
     
     <meta name="theme-color" content="#6366f1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     
     <style>
         * {
@@ -239,9 +239,10 @@
             font-weight: 700;
         }
 
-        .timer.expired {
+        .timer.warning {
             background: rgba(239, 68, 68, 0.2);
             color: var(--danger);
+            animation: pulse 1s infinite;
         }
 
         .page {
@@ -366,25 +367,6 @@
             border-color: var(--primary);
         }
 
-        .file-upload {
-            width: 100%;
-            padding: 40px;
-            background: var(--darker);
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .file-upload:hover {
-            border-color: var(--primary);
-        }
-
-        .file-upload input {
-            display: none;
-        }
-
         .result-box {
             background: var(--darker);
             border-radius: 12px;
@@ -470,7 +452,6 @@
         .access-icon {
             font-size: 72px;
             margin-bottom: 24px;
-            animation: pulse 2s infinite;
         }
 
         .access-title {
@@ -494,8 +475,13 @@
         .time-value {
             font-size: 36px;
             font-weight: 800;
-            color: var(--danger);
+            color: var(--primary);
             margin-bottom: 8px;
+        }
+
+        .time-value.warning {
+            color: var(--danger);
+            animation: pulse 1s infinite;
         }
 
         .btn-unlock {
@@ -519,6 +505,14 @@
         .btn-unlock:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .unlock-section {
+            display: none;
+        }
+
+        .unlock-section.active {
+            display: block;
         }
 
         .video-link {
@@ -679,10 +673,12 @@
             font-weight: 600;
         }
 
-        #qrcode {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
+        #qrCodeCanvas {
+            margin: 20px auto;
+            display: block;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
         }
 
         .resume-preview {
@@ -693,13 +689,33 @@
             margin-top: 20px;
         }
 
-        .resume-preview h3 {
+        .resume-preview h2 {
             color: var(--primary);
             margin-bottom: 16px;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 8px;
+        }
+
+        .resume-preview h3 {
+            color: #333;
+            margin: 24px 0 12px;
         }
 
         .resume-preview section {
             margin-bottom: 24px;
+        }
+
+        .btn-download {
+            width: 100%;
+            padding: 14px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
         }
 
         .color-palette {
@@ -832,10 +848,6 @@
             </div>
         </div>
 
-        <!-- TOOL PAGES (Same as before - copy from previous code) -->
-        <!-- Copy all tool pages here from the previous complete code -->
-        <!-- questionSolverPage, aiGirlfriendPage, qrGeneratorPage, etc. -->
-
         <div class="page" id="questionSolverPage">
             <div class="tool-page">
                 <div class="tool-header">
@@ -884,7 +896,7 @@
                         <textarea class="input-field" id="qrText" placeholder="Enter text, URL..." style="min-height: 80px;"></textarea>
                     </div>
                     <button class="btn btn-primary" onclick="generateQR()">🎨 Generate QR</button>
-                    <div id="qrcode"></div>
+                    <canvas id="qrCodeCanvas"></canvas>
                 </div>
             </div>
         </div>
@@ -993,16 +1005,21 @@
             <div class="access-page">
                 <div class="access-card">
                     <div class="access-icon">⏰</div>
-                    <div class="access-title">Access Expired!</div>
-                    <div class="access-desc">Get 24 hours unlimited access</div>
+                    <div class="access-title" id="accessTitle">Access Status</div>
+                    <div class="access-desc" id="accessDesc">Checking your access...</div>
                     <div class="time-display">
+                        <div style="font-size: 14px; color: var(--text-dim); margin-bottom: 8px;">
+                            <span id="accessLabel">Time Remaining</span>
+                        </div>
                         <div class="time-value" id="accessTimer">00:00:00</div>
                     </div>
-                    <button class="btn-unlock" onclick="unlockAccess()">🔓 Get 24 Hour Access</button>
-                    <a href="https://youtube.com/watch?v=demo" target="_blank" class="video-link">📺 How to get access?</a>
-                    <div class="recent-unlocks">
-                        <div style="font-weight: 600; margin-bottom: 12px;">🟢 Recent Unlocks</div>
-                        <div id="recentUnlocks"></div>
+                    <div class="unlock-section" id="unlockSection">
+                        <button class="btn-unlock" onclick="unlockAccess()" id="unlockButton">🔓 Get 24 Hour Access</button>
+                        <a href="https://youtube.com/watch?v=demo" target="_blank" class="video-link">📺 How to get access?</a>
+                        <div class="recent-unlocks">
+                            <div style="font-weight: 600; margin-bottom: 12px;">🟢 Recent Unlocks</div>
+                            <div id="recentUnlocks"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1078,10 +1095,15 @@
         </div>
     </div>
 
+    <!-- QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- html2canvas for Resume Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getDatabase, ref, set, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, set, get, update, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAtz-6L1G66Tp6YaC8UBHyaLpZkMYpb3Zs",
@@ -1119,7 +1141,7 @@
 
             if (!snapshot.exists()) {
                 const now = Date.now();
-                const expiry = now + (60 * 60 * 1000);
+                const expiry = now + (60 * 60 * 1000); // 1 hour free
                 await set(userRef, {
                     email: user.email,
                     createdAt: now,
@@ -1134,6 +1156,7 @@
 
             startTimer();
             loadUserStats();
+            updateAccessPageUI();
 
             if (window.isAdmin) {
                 addAdminNav();
@@ -1149,7 +1172,6 @@
         function showApp() {
             document.getElementById('authPage').classList.remove('active');
             document.getElementById('appContainer').classList.add('active');
-            if (Date.now() >= window.accessExpiry) lockApp();
         }
 
         window.handleAuth = async function(type) {
@@ -1173,13 +1195,14 @@
                     await signInWithEmailAndPassword(auth, email, password);
                 } else {
                     await createUserWithEmailAndPassword(auth, email, password);
-                    showAlert('authAlert', '🎉 Welcome! 1 hour free!', 'success');
+                    showAlert('authAlert', '🎉 Welcome! 1 hour free access!', 'success');
                 }
             } catch (error) {
                 let message = 'An error occurred';
                 if (error.code === 'auth/email-already-in-use') message = 'Email already registered';
                 if (error.code === 'auth/user-not-found') message = 'User not found';
                 if (error.code === 'auth/wrong-password') message = 'Wrong password';
+                if (error.code === 'auth/invalid-email') message = 'Invalid email';
                 showAlert('authAlert', message, 'error');
             } finally {
                 showLoading(false);
@@ -1187,7 +1210,9 @@
         };
 
         window.logout = async function() {
-            if (confirm('Logout?')) await signOut(auth);
+            if (confirm('Logout?')) {
+                await signOut(auth);
+            }
         };
 
         function startTimer() {
@@ -1206,26 +1231,67 @@
 
             const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             
-            document.getElementById('timerDisplay').textContent = display;
-            document.getElementById('accessTimer').textContent = display;
+            const timerDisplay = document.getElementById('timerDisplay');
+            const accessTimer = document.getElementById('accessTimer');
+            
+            if (timerDisplay) timerDisplay.textContent = display;
+            if (accessTimer) accessTimer.textContent = display;
 
-            if (remaining <= 0) lockApp();
+            // Update timer color based on remaining time
+            const timerElement = document.getElementById('timer');
+            const accessTimerElement = document.getElementById('accessTimer');
+            
+            if (remaining <= 0) {
+                if (timerElement) timerElement.classList.add('warning');
+                if (accessTimerElement) accessTimerElement.classList.add('warning');
+                lockApp();
+            } else if (remaining < 300000) { // Less than 5 minutes
+                if (timerElement) timerElement.classList.add('warning');
+                if (accessTimerElement) accessTimerElement.classList.add('warning');
+            } else {
+                if (timerElement) timerElement.classList.remove('warning');
+                if (accessTimerElement) accessTimerElement.classList.remove('warning');
+            }
 
-            if (remaining < 300000) {
-                document.getElementById('timer').classList.add('expired');
+            updateAccessPageUI();
+        }
+
+        function updateAccessPageUI() {
+            const now = Date.now();
+            const remaining = window.accessExpiry - now;
+            
+            const unlockSection = document.getElementById('unlockSection');
+            const accessTitle = document.getElementById('accessTitle');
+            const accessDesc = document.getElementById('accessDesc');
+            const accessLabel = document.getElementById('accessLabel');
+            const accessIcon = document.querySelector('.access-icon');
+
+            if (remaining > 0) {
+                // User has active access
+                if (accessTitle) accessTitle.textContent = 'Access Active ✅';
+                if (accessDesc) accessDesc.textContent = 'Enjoy unlimited AI tools!';
+                if (accessLabel) accessLabel.textContent = 'Access Expiring In';
+                if (accessIcon) accessIcon.textContent = '✅';
+                if (unlockSection) unlockSection.classList.remove('active');
+            } else {
+                // Access expired
+                if (accessTitle) accessTitle.textContent = 'Access Expired 🔒';
+                if (accessDesc) accessDesc.textContent = 'Unlock 24 hours unlimited access';
+                if (accessLabel) accessLabel.textContent = 'Expired';
+                if (accessIcon) accessIcon.textContent = '🔒';
+                if (unlockSection) unlockSection.classList.add('active');
             }
         }
 
         function lockApp() {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.add('locked'));
             document.querySelector('.nav-item[onclick*="access"]').classList.remove('locked');
-            switchPage('access');
-            updateRecentUnlocks();
+            updateAccessPageUI();
         }
 
         function unlockApp() {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('locked'));
-            switchPage('home');
+            updateAccessPageUI();
         }
 
         window.unlockAccess = async function() {
@@ -1244,7 +1310,6 @@
                 });
 
                 const verifyUrl = `${window.location.origin}/verify.html?uid=${userId}&token=${token}`;
-
                 const idToken = await window.currentUser.getIdToken();
                 
                 const response = await fetch(`/api/shortlink`, {
@@ -1260,13 +1325,14 @@
 
                 if (data.success) {
                     window.open(data.shortUrl, '_blank');
-                    showAlert('accessPage', 'Complete task to unlock!', 'success');
+                    alert('✅ Complete the task to unlock 24 hour access!');
                 } else {
                     throw new Error(data.error);
                 }
 
             } catch (error) {
-                showAlert('accessPage', 'Failed. Try again.', 'error');
+                console.error('Unlock error:', error);
+                alert('❌ Failed to generate link. Please try again.');
             } finally {
                 showLoading(false);
             }
@@ -1277,14 +1343,20 @@
         }
 
         function updateRecentUnlocks() {
+            const container = document.getElementById('recentUnlocks');
+            if (!container) return;
+
             const fakeNames = [
                 'user_' + Math.random().toString(36).substr(2, 5),
                 'member_' + Math.random().toString(36).substr(2, 5),
                 'ai_fan_' + Math.random().toString(36).substr(2, 4)
             ];
 
-            const html = fakeNames.map(name => `<div class="unlock-item">🟢 ${name} unlocked access</div>`).join('');
-            document.getElementById('recentUnlocks').innerHTML = html;
+            const html = fakeNames.map(name => 
+                `<div class="unlock-item">🟢 ${name} unlocked access</div>`
+            ).join('');
+            
+            container.innerHTML = html;
             setTimeout(updateRecentUnlocks, 30000);
         }
 
@@ -1298,6 +1370,7 @@
         window.openTool = function(tool) {
             if (Date.now() >= window.accessExpiry) {
                 lockApp();
+                switchPage('access');
                 return;
             }
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1322,20 +1395,27 @@
                 return data.response;
 
             } catch (error) {
-                return 'AI service temporarily unavailable.';
+                console.error('AI Error:', error);
+                return 'AI service temporarily unavailable. Please try again.';
             }
         }
 
         window.solveQuestion = async function() {
             const text = document.getElementById('questionText').value.trim();
-            if (!text) return alert('Enter question');
+            if (!text) return alert('Please enter a question');
 
             showLoading(true);
 
             const answer = await callAI([
-                { role: 'system', content: 'You are a tutor. Solve step-by-step.' },
-                { role: 'user', content: `Question: ${text}\n\nSolve:` }
-            ], 1000);
+                { 
+                    role: 'system', 
+                    content: 'You are an expert tutor. Solve questions step-by-step in a clear, detailed manner. Use Hindi and English mix (Hinglish) if it helps explain better. Show all steps clearly.' 
+                },
+                { 
+                    role: 'user', 
+                    content: `Question: ${text}\n\nPlease solve this question with detailed step-by-step explanation:` 
+                }
+            ], 1500);
 
             document.getElementById('questionResult').innerHTML = `
                 <div class="result-box">
@@ -1361,9 +1441,12 @@
             showLoading(true);
 
             const reply = await callAI([
-                { role: 'system', content: 'You are a loving AI girlfriend. Reply in 1-2 sentences with emojis.' },
+                { 
+                    role: 'system', 
+                    content: 'You are a loving, caring AI girlfriend. Reply sweetly, use emojis, be flirty and affectionate. Keep responses 1-3 sentences. Use Hinglish (Hindi-English mix) naturally.' 
+                },
                 { role: 'user', content: message }
-            ], 100);
+            ], 150);
 
             chatContainer.innerHTML += `<div class="chat-message ai"><div class="message-bubble">${reply}</div></div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -1373,14 +1456,17 @@
         window.generateCaption = async function() {
             const topic = document.getElementById('captionTopic').value.trim();
             const tone = document.getElementById('captionTone').value;
-            if (!topic) return alert('Describe post');
+            if (!topic) return alert('Please describe your post');
 
             showLoading(true);
 
             const captions = await callAI([
-                { role: 'system', content: `Generate 3 ${tone} Instagram captions with emojis.` },
-                { role: 'user', content: topic }
-            ], 300);
+                { 
+                    role: 'system', 
+                    content: `Generate 5 creative Instagram captions in ${tone} tone. Each caption should be unique, engaging, and include relevant emojis. Make them viral-worthy!` 
+                },
+                { role: 'user', content: `Topic: ${topic}\n\nGenerate captions:` }
+            ], 500);
 
             document.getElementById('captionResult').innerHTML = `
                 <div class="result-box">
@@ -1394,18 +1480,21 @@
 
         window.paraphraseText = async function() {
             const text = document.getElementById('paraphraseText').value.trim();
-            if (!text) return alert('Enter text');
+            if (!text) return alert('Please enter text to paraphrase');
 
             showLoading(true);
 
             const result = await callAI([
-                { role: 'system', content: 'Rewrite uniquely keeping same meaning.' },
-                { role: 'user', content: text }
-            ], 800);
+                { 
+                    role: 'system', 
+                    content: 'Rewrite the given text in a completely unique way while preserving the original meaning. Make it more natural and fluent. Avoid plagiarism completely.' 
+                },
+                { role: 'user', content: `Paraphrase this:\n\n${text}` }
+            ], 1000);
 
             document.getElementById('paraphraseResult').innerHTML = `
                 <div class="result-box">
-                    <h3 style="color: var(--primary); margin-bottom: 16px;">🔄 Paraphrased:</h3>
+                    <h3 style="color: var(--primary); margin-bottom: 16px;">🔄 Paraphrased Text:</h3>
                     <div>${result}</div>
                 </div>
             `;
@@ -1415,18 +1504,21 @@
 
         window.checkGrammar = async function() {
             const text = document.getElementById('grammarText').value.trim();
-            if (!text) return alert('Enter text');
+            if (!text) return alert('Please enter text to check');
 
             showLoading(true);
 
             const result = await callAI([
-                { role: 'system', content: 'Check grammar. Provide corrected text.' },
-                { role: 'user', content: text }
-            ], 800);
+                { 
+                    role: 'system', 
+                    content: 'You are a grammar expert. Check the text for grammar, spelling, and punctuation errors. Provide the corrected version and explain mistakes if any.' 
+                },
+                { role: 'user', content: `Check grammar:\n\n${text}` }
+            ], 1000);
 
             document.getElementById('grammarResult').innerHTML = `
                 <div class="result-box">
-                    <h3 style="color: var(--success); margin-bottom: 16px;">✅ Corrected:</h3>
+                    <h3 style="color: var(--success); margin-bottom: 16px;">✅ Grammar Check:</h3>
                     <div>${result.replace(/\n/g, '<br>')}</div>
                 </div>
             `;
@@ -1436,13 +1528,26 @@
 
         window.generateQR = function() {
             const text = document.getElementById('qrText').value.trim();
-            if (!text) return alert('Enter text');
+            if (!text) return alert('Please enter text or URL');
 
-            document.getElementById('qrcode').innerHTML = `
-                <div style="width: 200px; height: 200px; background: white; border: 2px solid #000; display: flex; align-items: center; justify-content: center; color: #000; padding: 20px; text-align: center;">
-                    QR for:<br>${text.substring(0, 30)}...
-                </div>
-            `;
+            const canvas = document.getElementById('qrCodeCanvas');
+            canvas.innerHTML = '';
+            canvas.style.display = 'block';
+
+            // Generate QR code using QRCode.js
+            QRCode.toCanvas(canvas, text, {
+                width: 250,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }, function (error) {
+                if (error) {
+                    console.error(error);
+                    alert('Failed to generate QR code');
+                }
+            });
         };
 
         window.generateResume = function() {
@@ -1452,11 +1557,11 @@
             const summary = document.getElementById('resumeSummary').value.trim();
             const skills = document.getElementById('resumeSkills').value.trim();
 
-            if (!name || !email || !summary) return alert('Fill required fields');
+            if (!name || !email || !summary) return alert('Please fill required fields (Name, Email, Summary)');
 
-            document.getElementById('resumePreview').innerHTML = `
-                <div class="resume-preview">
-                    <h2 style="color: var(--primary); margin-bottom: 8px;">${name}</h2>
+            const resumeHTML = `
+                <div class="resume-preview" id="resumeContent">
+                    <h2>${name}</h2>
                     <p style="margin-bottom: 20px;">${email} | ${phone}</p>
                     <section>
                         <h3>Professional Summary</h3>
@@ -1467,7 +1572,36 @@
                         <p>${skills.split(',').map(s => s.trim()).join(' • ')}</p>
                     </section>
                 </div>
+                <button class="btn-download" onclick="downloadResume()">📥 Download Resume</button>
             `;
+
+            document.getElementById('resumePreview').innerHTML = resumeHTML;
+        };
+
+        window.downloadResume = async function() {
+            const resumeContent = document.getElementById('resumeContent');
+            if (!resumeContent) return;
+
+            showLoading(true);
+
+            try {
+                const canvas = await html2canvas(resumeContent, {
+                    backgroundColor: '#ffffff',
+                    scale: 2
+                });
+
+                const link = document.createElement('a');
+                link.download = 'my-resume.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                alert('✅ Resume downloaded successfully!');
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('❌ Failed to download resume');
+            } finally {
+                showLoading(false);
+            }
         };
 
         window.generatePalette = function() {
@@ -1483,7 +1617,7 @@
                 box.style.color = isLight(color) ? '#000' : '#fff';
                 box.onclick = () => {
                     navigator.clipboard.writeText(color);
-                    alert('Copied: ' + color);
+                    alert('✅ Copied: ' + color);
                 };
                 palette.appendChild(box);
             }
@@ -1498,19 +1632,29 @@
         }
 
         async function loadUserStats() {
+            if (!window.currentUser) return;
+            
             const userRef = ref(database, `users/${window.currentUser.uid}`);
             const snapshot = await get(userRef);
             const data = snapshot.val();
 
-            document.getElementById('userToolsUsed').textContent = data.toolsUsed || 0;
-            document.getElementById('userAccessCount').textContent = data.accessCount || 0;
+            if (!data) return;
+
+            const toolsUsedEl = document.getElementById('userToolsUsed');
+            const accessCountEl = document.getElementById('userAccessCount');
+            const memberSinceEl = document.getElementById('memberSince');
+            const avatarEl = document.getElementById('profileAvatar');
+            const emailEl = document.getElementById('profileEmail');
+
+            if (toolsUsedEl) toolsUsedEl.textContent = data.toolsUsed || 0;
+            if (accessCountEl) accessCountEl.textContent = data.accessCount || 0;
             
             const joinDate = new Date(data.createdAt).toLocaleDateString();
-            document.getElementById('memberSince').textContent = joinDate;
+            if (memberSinceEl) memberSinceEl.textContent = joinDate;
 
             const initial = window.currentUser.email.charAt(0).toUpperCase();
-            document.getElementById('profileAvatar').textContent = initial;
-            document.getElementById('profileEmail').textContent = window.currentUser.email;
+            if (avatarEl) avatarEl.textContent = initial;
+            if (emailEl) emailEl.textContent = window.currentUser.email;
         }
 
         function addAdminNav() {
@@ -1526,52 +1670,76 @@
         }
 
         async function loadAdminStats() {
-            const usersRef = ref(database, 'users');
-            const snapshot = await get(usersRef);
-            if (!snapshot.exists()) return;
+            if (!window.isAdmin) return;
 
-            const users = snapshot.val();
-            const userArray = Object.values(users);
-
-            document.getElementById('adminTotalUsers').textContent = userArray.length;
-            document.getElementById('adminActiveAccess').textContent = userArray.filter(u => u.accessExpiry > Date.now()).length;
-            
-            const today = new Date().setHours(0,0,0,0);
-            document.getElementById('adminTodaySignups').textContent = userArray.filter(u => u.createdAt >= today).length;
-
-            const revenue = userArray.reduce((sum, u) => sum + (u.accessCount || 0), 0);
-            document.getElementById('adminRevenue').textContent = '₹' + revenue;
-
-            const list = document.getElementById('adminUserList');
-            list.innerHTML = '';
-
-            userArray.slice(0, 10).forEach(user => {
-                const hours = Math.floor(Math.max(0, user.accessExpiry - Date.now()) / (1000 * 60 * 60));
+            try {
+                const usersRef = ref(database, 'users');
+                const snapshot = await get(usersRef);
                 
-                list.innerHTML += `
-                    <div class="user-item">
-                        <div style="display: flex; justify-content: space-between;">
-                            <div>
-                                <div style="font-weight: 600;">${user.email}</div>
-                                <div style="font-size: 12px; color: var(--text-dim);">
-                                    Tools: ${user.toolsUsed || 0} | Access: ${user.accessCount || 0}
+                if (!snapshot.exists()) {
+                    console.log('No users found');
+                    return;
+                }
+
+                const users = snapshot.val();
+                const userArray = Object.entries(users).map(([id, data]) => ({
+                    id,
+                    ...data
+                }));
+
+                const totalEl = document.getElementById('adminTotalUsers');
+                const activeEl = document.getElementById('adminActiveAccess');
+                const todayEl = document.getElementById('adminTodaySignups');
+                const revenueEl = document.getElementById('adminRevenue');
+
+                if (totalEl) totalEl.textContent = userArray.length;
+                if (activeEl) activeEl.textContent = userArray.filter(u => u.accessExpiry > Date.now()).length;
+                
+                const today = new Date().setHours(0,0,0,0);
+                if (todayEl) todayEl.textContent = userArray.filter(u => u.createdAt >= today).length;
+
+                const revenue = userArray.reduce((sum, u) => sum + (u.accessCount || 0), 0);
+                if (revenueEl) revenueEl.textContent = '₹' + (revenue * 10);
+
+                const list = document.getElementById('adminUserList');
+                if (list) {
+                    list.innerHTML = '';
+
+                    userArray.slice(0, 20).forEach(user => {
+                        const hours = Math.floor(Math.max(0, user.accessExpiry - Date.now()) / (1000 * 60 * 60));
+                        
+                        list.innerHTML += `
+                            <div class="user-item">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; margin-bottom: 4px;">${user.email}</div>
+                                        <div style="font-size: 12px; color: var(--text-dim);">
+                                            Tools: ${user.toolsUsed || 0} | Unlocks: ${user.accessCount || 0}
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 14px; font-weight: 600; color: ${hours > 0 ? 'var(--success)' : 'var(--danger)'};">
+                                        ${hours}h
+                                    </div>
                                 </div>
                             </div>
-                            <div style="font-size: 12px; color: ${hours > 0 ? 'var(--success)' : 'var(--danger)'};">
-                                ${hours}h left
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
+                        `;
+                    });
+                }
+
+            } catch (error) {
+                console.error('Admin stats error:', error);
+            }
         }
 
         function showLoading(show) {
-            document.getElementById('loading').classList.toggle('active', show);
+            const loading = document.getElementById('loading');
+            if (loading) loading.classList.toggle('active', show);
         }
 
         function showAlert(containerId, message, type) {
             const container = document.getElementById(containerId);
+            if (!container) return;
+            
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
@@ -1580,7 +1748,13 @@
             setTimeout(() => alert.remove(), 5000);
         }
 
+        // Initialize
         updateRecentUnlocks();
+        
+        // Refresh admin stats every 30 seconds if admin
+        if (window.isAdmin) {
+            setInterval(loadAdminStats, 30000);
+        }
     </script>
 </body>
 </html>

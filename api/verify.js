@@ -1,24 +1,20 @@
 const admin = require('firebase-admin');
 
-if (admin.apps.length === 0) {
-    try {
-        admin.initializeApp({
-            credential: admin.credential.cert({
-                projectId: process.env.FIREBASE_PROJECT_ID,
-                privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            }),
-            databaseURL: "https://ai-perfect-tools-default-rtdb.asia-southeast1.firebasedatabase.app"
-        });
-    } catch (error) {
-        console.error('Firebase init error:', error);
-    }
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        }),
+        databaseURL: "https://ai-perfect-tools-default-rtdb.asia-southeast1.firebasedatabase.app"
+    });
 }
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,PUT');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
@@ -39,48 +35,48 @@ export default async function handler(req, res) {
             });
         }
 
-        // Get token data
+        // Get token
         const tokenRef = admin.database().ref(`tokens/${token}`);
         const snapshot = await tokenRef.once('value');
 
         if (!snapshot.exists()) {
             return res.status(200).json({ 
                 success: false, 
-                message: 'Invalid or expired link' 
+                message: 'Invalid link' 
             });
         }
 
         const data = snapshot.val();
 
-        // Validate token
+        // Validate
         if (data.used) {
             return res.status(200).json({ 
                 success: false, 
-                message: 'This link has already been used' 
+                message: 'Already used' 
             });
         }
 
         if (data.userId !== userId) {
             return res.status(200).json({ 
                 success: false, 
-                message: 'Invalid user ID' 
+                message: 'Invalid user' 
             });
         }
 
         if (Date.now() > data.expiresAt) {
             return res.status(200).json({ 
                 success: false, 
-                message: 'Link expired (valid for 5 minutes only)' 
+                message: 'Link expired' 
             });
         }
 
-        // Mark token as used
+        // Mark as used
         await tokenRef.update({ 
             used: true, 
             usedAt: Date.now() 
         });
 
-        // Add 24 hours to user's access
+        // Add 24 hours
         const userRef = admin.database().ref(`users/${userId}`);
         const userSnap = await userRef.once('value');
         const userData = userSnap.val();
@@ -92,7 +88,7 @@ export default async function handler(req, res) {
             });
         }
 
-        const newExpiry = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
+        const newExpiry = Date.now() + (24 * 60 * 60 * 1000);
         
         await userRef.update({
             accessExpiry: newExpiry,
@@ -102,7 +98,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({ 
             success: true, 
-            message: '24 hours unlimited access added successfully!',
+            message: '24 hours access added!',
             newExpiry: newExpiry
         });
 
@@ -110,8 +106,7 @@ export default async function handler(req, res) {
         console.error('Verify Error:', error);
         return res.status(500).json({ 
             success: false,
-            message: 'Verification failed',
-            error: error.message 
+            message: 'Verification failed'
         });
     }
-}
+};

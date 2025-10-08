@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfect AI Tools - Free AI Tools Hub</title>
+    
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #1a1a2e;
+            --darker: #0f0f1e;
+            --card: #252540;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.8); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading.active { display: flex; }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .auth-page {
+            display: none;
+            min-height: 100vh;
+            padding: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-page.active { display: flex; }
+
+        .auth-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: fadeIn 0.5s;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-logo-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: pulse 2s infinite;
+        }
+
+        .auth-logo h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .auth-logo p {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--darker);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: fadeIn 0.3s;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .app-container.active { display: block; }
+
+        .app-header {
+            background: var(--card);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-name {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--darker);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .timer.expired {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .page.active { display: block; }
+
+        .home-page {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 24px 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .tool-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .tool-card:active {
+            transform: scale(0.98);
+        }
+
+        .tool-card.trending {
+            border: 2px solid var(--primary);
+            animation: glow 2s infinite;
+        }
+
+        .tool-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .tool-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .tool-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .tool-page {
+            padding: 20px;
+        }
+
+        .tool-header {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .tool-content {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--darker);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .file-upload {
+            width: 100%;
+            padding: 40px;
+            background: var(--darker);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .result-box {
+            background: var(--darker);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+
+        .chat-container {
+            background: var(--darker);
+            border-radius: 12px;
+            padding: 16px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+
+        .chat-message {
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        .chat-message.user {
+            text-align: right;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            padding: 12px 16px;
+            border-radius: 16px;
+            max-width: 80%;
+        }
+
+        .chat-message.user .message-bubble {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .chat-message.ai .message-bubble {
+            background: var(--card);
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            background: var(--darker);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .chat-input button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .access-page {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .access-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 40px 24px;
+            margin: 40px auto;
+            max-width: 400px;
+        }
+
+        .access-icon {
+            font-size: 72px;
+            margin-bottom: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        .access-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .access-desc {
+            color: var(--text-dim);
+            margin-bottom: 24px;
+        }
+
+        .time-display {
+            background: var(--darker);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .time-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--danger);
+            margin-bottom: 8px;
+        }
+
+        .btn-unlock {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-unlock:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .btn-unlock:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .video-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .recent-unlocks {
+            background: var(--darker);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 13px;
+        }
+
+        .unlock-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .unlock-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-page {
+            padding: 20px;
+        }
+
+        .profile-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 40px 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .profile-email {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .profile-id {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+        }
+
+        .btn-logout {
+            padding: 14px 32px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .admin-page {
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .user-list {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .user-item {
+            padding: 16px;
+            background: var(--darker);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+            margin: 0 4px;
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        .nav-item.locked {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .resume-preview {
+            background: white;
+            color: #000;
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .resume-preview h3 {
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .resume-preview section {
+            margin-bottom: 24px;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .color-box {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .color-box:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 380px) {
+            .tools-grid, .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="auth-page active" id="authPage">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <div class="auth-logo-icon">🤖</div>
+                <h1>Perfect AI Tools</h1>
+                <p>Your All-in-One AI Tools Hub</p>
+            </div>
+
+            <div id="authAlert"></div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-input" id="authEmail" placeholder="your@email.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="authPassword" placeholder="••••••••">
+            </div>
+
+            <button class="btn btn-primary" onclick="handleAuth('login')">Login</button>
+            <button class="btn btn-secondary" onclick="handleAuth('signup')">Create New Account</button>
+        </div>
+    </div>
+
+    <div class="app-container" id="appContainer">
+        <div class="app-header">
+            <div class="app-name">🤖 Perfect AI Tools</div>
+            <div class="timer" id="timer">
+                <span>⏰</span>
+                <span id="timerDisplay">00:00:00</span>
+            </div>
+        </div>
+
+        <div class="page active" id="homePage">
+            <div class="home-page">
+                <div class="section-title">🔥 Trending Tools</div>
+                <div class="tools-grid">
+                    <div class="tool-card trending" onclick="openTool('questionSolver')">
+                        <div class="tool-icon">🎓</div>
+                        <div class="tool-name">AI Question Solver</div>
+                        <div class="tool-desc">Upload & solve questions</div>
+                        <button class="btn-start">Start Now</button>
+                    </div>
+                    <div class="tool-card trending" onclick="openTool('aiGirlfriend')">
+                        <div class="tool-icon">💝</div>
+                        <div class="tool-name">AI Girlfriend</div>
+                        <div class="tool-desc">Chat with AI companion</div>
+                        <button class="btn-start">Start Now</button>
+                    </div>
+                </div>
+
+                <div class="section-title">🎯 All Tools</div>
+                <div class="tools-grid">
+                    <div class="tool-card" onclick="openTool('qrGenerator')">
+                        <div class="tool-icon">📱</div>
+                        <div class="tool-name">QR Generator</div>
+                        <div class="tool-desc">Create custom QR codes</div>
+                        <button class="btn-start">Start Now</button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('resumeBuilder')">
+                        <div class="tool-icon">📄</div>
+                        <div class="tool-name">Resume Builder</div>
+                        <div class="tool-desc">Build professional resume</div>
+                        <button class="btn-start">Start Now</button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('captionGenerator')">
+                        <div class="tool-icon">✍️</div>
+                        <div class="tool-name">Caption Generator</div>
+                        <div class="tool-desc">AI Instagram captions</div>
+                        <button class="btn-start">Start Now</button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('paraphraser')">
+                        <div class="tool-icon">📝</div>
+                        <div class="tool-name">Text Paraphraser</div>
+                        <div class="tool-desc">Rewrite text uniquely</div>
+                        <button class="btn-start">Start Now</button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('grammarChecker')">
+                        <div class="tool-icon">✅</div>
+                        <div class="tool-name">Grammar Checker</div>
+                        <div class="tool-desc">Fix grammar mistakes</div>
+                        <button class="btn-start">Start Now</button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('colorPalette')">
+                        <div class="tool-icon">🎨</div>
+                        <div class="tool-name">Color Palette</div>
+                        <div class="tool-desc">Generate colors</div>
+                        <button class="btn-start">Start Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOOL PAGES (Same as before - copy from previous code) -->
+        <!-- Copy all tool pages here from the previous complete code -->
+        <!-- questionSolverPage, aiGirlfriendPage, qrGeneratorPage, etc. -->
+
+        <div class="page" id="questionSolverPage">
+            <div class="tool-page">
+                <div class="tool-header">
+                    <h2>🎓 AI Question Solver</h2>
+                    <p style="color: var(--text-dim);">Paste question text</p>
+                </div>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label class="input-label">Paste Question Text</label>
+                        <textarea class="input-field" id="questionText" placeholder="Type or paste your question here..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="solveQuestion()">🔍 Solve Question</button>
+                    <div id="questionResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="aiGirlfriendPage">
+            <div class="tool-page">
+                <div class="tool-header">
+                    <h2>💝 AI Girlfriend</h2>
+                    <p style="color: var(--text-dim);">Your virtual companion</p>
+                </div>
+                <div class="tool-content">
+                    <div class="chat-container" id="chatContainer">
+                        <div class="chat-message ai">
+                            <div class="message-bubble">Hey baby! 😘 I've been waiting for you. How was your day?</div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter') sendMessage()">
+                        <button onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="qrGeneratorPage">
+            <div class="tool-page">
+                <div class="tool-header">
+                    <h2>📱 QR Code Generator</h2>
+                </div>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label class="input-label">Enter Text or URL</label>
+                        <textarea class="input-field" id="qrText" placeholder="Enter text, URL..." style="min-height: 80px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateQR()">🎨 Generate QR</button>
+                    <div id="qrcode"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="resumeBuilderPage">
+            <div class="tool-page">
+                <div class="tool-header">
+                    <h2>📄 Resume Builder</h2>
+                </div>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label class="input-label">Full Name</label>
+                        <input type="text" class="form-input" id="resumeName" placeholder="John Doe">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Email</label>
+                        <input type="email" class="form-input" id="resumeEmail" placeholder="john@example.com">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Phone</label>
+                        <input type="tel" class="form-input" id="resumePhone" placeholder="+91 1234567890">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Professional Summary</label>
+                        <textarea class="input-field" id="resumeSummary" placeholder="Brief summary..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Skills (comma separated)</label>
+                        <textarea class="input-field" id="resumeSkills" placeholder="Python, JavaScript..." style="min-height: 80px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateResume()">📄 Generate Resume</button>
+                    <div id="resumePreview"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="captionGeneratorPage">
+            <div class="tool-page">
+                <div class="tool-header">
+                    <h2>✍️ Caption Generator</h2>
+                </div>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label class="input-label">Describe Your Post</label>
+                        <textarea class="input-field" id="captionTopic" placeholder="E.g., Beach sunset..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Tone</label>
+                        <select class="form-input" id="captionTone">
+                            <option value="casual">Casual & Fun</option>
+                            <option value="professional">Professional</option>
+                            <option value="motivational">Motivational</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateCaption()">✨ Generate</button>
+                    <div id="captionResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="paraphraserPage">
+            <div class="tool-page">
+                <div class="tool-header">
+                    <h2>📝 Text Paraphraser</h2>
+                </div>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label class="input-label">Enter Text to Paraphrase</label>
+                        <textarea class="input-field" id="paraphraseText" placeholder="Paste your text..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="paraphraseText()">🔄 Paraphrase</button>
+                    <div id="paraphraseResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="grammarCheckerPage">
+            <div class="tool-page">
+                <div class="tool-header">
+                    <h2>✅ Grammar Checker</h2>
+                </div>
+                <div class="tool-content">
+                    <div class="input-group">
+                        <label class="input-label">Enter Text</label>
+                        <textarea class="input-field" id="grammarText" placeholder="Paste your text..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="checkGrammar()">✔️ Check</button>
+                    <div id="grammarResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="colorPalettePage">
+            <div class="tool-page">
+                <div class="tool-header">
+                    <h2>🎨 Color Palette</h2>
+                </div>
+                <div class="tool-content">
+                    <button class="btn btn-primary" onclick="generatePalette()">🎨 Generate</button>
+                    <div class="color-palette" id="colorPalette"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="accessPage">
+            <div class="access-page">
+                <div class="access-card">
+                    <div class="access-icon">⏰</div>
+                    <div class="access-title">Access Expired!</div>
+                    <div class="access-desc">Get 24 hours unlimited access</div>
+                    <div class="time-display">
+                        <div class="time-value" id="accessTimer">00:00:00</div>
+                    </div>
+                    <button class="btn-unlock" onclick="unlockAccess()">🔓 Get 24 Hour Access</button>
+                    <a href="https://youtube.com/watch?v=demo" target="_blank" class="video-link">📺 How to get access?</a>
+                    <div class="recent-unlocks">
+                        <div style="font-weight: 600; margin-bottom: 12px;">🟢 Recent Unlocks</div>
+                        <div id="recentUnlocks"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="profilePage">
+            <div class="profile-page">
+                <div class="profile-card">
+                    <div class="profile-avatar" id="profileAvatar">👤</div>
+                    <div class="profile-email" id="profileEmail">user@email.com</div>
+                    <div class="profile-id">Member since: <span id="memberSince">Today</span></div>
+                    <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+                </div>
+                <div class="profile-card">
+                    <h3 style="margin-bottom: 16px;">📊 Your Stats</h3>
+                    <div class="stats-grid" style="text-align: left;">
+                        <div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="userToolsUsed">0</div>
+                            <div style="font-size: 12px; color: var(--text-dim);">Tools Used</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--success);" id="userAccessCount">0</div>
+                            <div style="font-size: 12px; color: var(--text-dim);">Access Unlocked</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="adminPage">
+            <div class="admin-page">
+                <div class="tool-header">
+                    <h2>👑 Admin Dashboard</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="adminTotalUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="adminActiveAccess">0</div>
+                        <div class="stat-label">Active Access</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="adminTodaySignups">0</div>
+                        <div class="stat-label">Today Signups</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="adminRevenue">₹0</div>
+                        <div class="stat-label">Revenue</div>
+                    </div>
+                </div>
+                <div class="user-list">
+                    <h3 style="margin-bottom: 16px;">👥 Recent Users</h3>
+                    <div id="adminUserList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchPage('home')">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </div>
+            <div class="nav-item" onclick="switchPage('access')">
+                <div class="nav-icon">⚡</div>
+                <div class="nav-label">Access</div>
+            </div>
+            <div class="nav-item" onclick="switchPage('profile')">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Profile</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getDatabase, ref, set, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtz-6L1G66Tp6YaC8UBHyaLpZkMYpb3Zs",
+            authDomain: "ai-perfect-tools.firebaseapp.com",
+            databaseURL: "https://ai-perfect-tools-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ai-perfect-tools",
+            storageBucket: "ai-perfect-tools.firebasestorage.app",
+            messagingSenderId: "310354907491",
+            appId: "1:310354907491:web:3bd0d5f184f6fe9a18c356"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        window.currentUser = null;
+        window.accessExpiry = 0;
+        window.timerInterval = null;
+        window.isAdmin = false;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.currentUser = user;
+                window.isAdmin = (user.email === 'vinadevi011985@gmail.com');
+                await initializeUser(user);
+                showApp();
+            } else {
+                showAuth();
+            }
+        });
+
+        async function initializeUser(user) {
+            const userRef = ref(database, `users/${user.uid}`);
+            const snapshot = await get(userRef);
+
+            if (!snapshot.exists()) {
+                const now = Date.now();
+                const expiry = now + (60 * 60 * 1000);
+                await set(userRef, {
+                    email: user.email,
+                    createdAt: now,
+                    accessExpiry: expiry,
+                    toolsUsed: 0,
+                    accessCount: 1
+                });
+                window.accessExpiry = expiry;
+            } else {
+                window.accessExpiry = snapshot.val().accessExpiry || 0;
+            }
+
+            startTimer();
+            loadUserStats();
+
+            if (window.isAdmin) {
+                addAdminNav();
+                loadAdminStats();
+            }
+        }
+
+        function showAuth() {
+            document.getElementById('authPage').classList.add('active');
+            document.getElementById('appContainer').classList.remove('active');
+        }
+
+        function showApp() {
+            document.getElementById('authPage').classList.remove('active');
+            document.getElementById('appContainer').classList.add('active');
+            if (Date.now() >= window.accessExpiry) lockApp();
+        }
+
+        window.handleAuth = async function(type) {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value;
+
+            if (!email || !password) {
+                showAlert('authAlert', 'Please fill all fields', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showAlert('authAlert', 'Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                if (type === 'login') {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    showAlert('authAlert', '🎉 Welcome! 1 hour free!', 'success');
+                }
+            } catch (error) {
+                let message = 'An error occurred';
+                if (error.code === 'auth/email-already-in-use') message = 'Email already registered';
+                if (error.code === 'auth/user-not-found') message = 'User not found';
+                if (error.code === 'auth/wrong-password') message = 'Wrong password';
+                showAlert('authAlert', message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        window.logout = async function() {
+            if (confirm('Logout?')) await signOut(auth);
+        };
+
+        function startTimer() {
+            if (window.timerInterval) clearInterval(window.timerInterval);
+            updateTimerDisplay();
+            window.timerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const now = Date.now();
+            const remaining = Math.max(0, window.accessExpiry - now);
+
+            const hours = Math.floor(remaining / (1000 * 60 * 60));
+            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+            const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            document.getElementById('timerDisplay').textContent = display;
+            document.getElementById('accessTimer').textContent = display;
+
+            if (remaining <= 0) lockApp();
+
+            if (remaining < 300000) {
+                document.getElementById('timer').classList.add('expired');
+            }
+        }
+
+        function lockApp() {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.add('locked'));
+            document.querySelector('.nav-item[onclick*="access"]').classList.remove('locked');
+            switchPage('access');
+            updateRecentUnlocks();
+        }
+
+        function unlockApp() {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('locked'));
+            switchPage('home');
+        }
+
+        window.unlockAccess = async function() {
+            showLoading(true);
+
+            try {
+                const token = generateToken();
+                const userId = window.currentUser.uid;
+
+                const tokenRef = ref(database, `tokens/${token}`);
+                await set(tokenRef, {
+                    userId: userId,
+                    used: false,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (5 * 60 * 1000)
+                });
+
+                const verifyUrl = `${window.location.origin}/verify.html?uid=${userId}&token=${token}`;
+
+                const idToken = await window.currentUser.getIdToken();
+                
+                const response = await fetch(`/api/shortlink`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({ url: verifyUrl, userId: userId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.open(data.shortUrl, '_blank');
+                    showAlert('accessPage', 'Complete task to unlock!', 'success');
+                } else {
+                    throw new Error(data.error);
+                }
+
+            } catch (error) {
+                showAlert('accessPage', 'Failed. Try again.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        function generateToken() {
+            return Math.random().toString(36).substr(2) + Date.now().toString(36);
+        }
+
+        function updateRecentUnlocks() {
+            const fakeNames = [
+                'user_' + Math.random().toString(36).substr(2, 5),
+                'member_' + Math.random().toString(36).substr(2, 5),
+                'ai_fan_' + Math.random().toString(36).substr(2, 4)
+            ];
+
+            const html = fakeNames.map(name => `<div class="unlock-item">🟢 ${name} unlocked access</div>`).join('');
+            document.getElementById('recentUnlocks').innerHTML = html;
+            setTimeout(updateRecentUnlocks, 30000);
+        }
+
+        window.switchPage = function(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(page + 'Page').classList.add('active');
+            event?.currentTarget?.classList.add('active');
+        };
+
+        window.openTool = function(tool) {
+            if (Date.now() >= window.accessExpiry) {
+                lockApp();
+                return;
+            }
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(tool + 'Page').classList.add('active');
+        };
+
+        async function callAI(messages, maxTokens = 500) {
+            try {
+                const idToken = await window.currentUser.getIdToken();
+                
+                const response = await fetch(`/api/ai`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({ messages, maxTokens })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error);
+                return data.response;
+
+            } catch (error) {
+                return 'AI service temporarily unavailable.';
+            }
+        }
+
+        window.solveQuestion = async function() {
+            const text = document.getElementById('questionText').value.trim();
+            if (!text) return alert('Enter question');
+
+            showLoading(true);
+
+            const answer = await callAI([
+                { role: 'system', content: 'You are a tutor. Solve step-by-step.' },
+                { role: 'user', content: `Question: ${text}\n\nSolve:` }
+            ], 1000);
+
+            document.getElementById('questionResult').innerHTML = `
+                <div class="result-box">
+                    <h3 style="color: var(--primary); margin-bottom: 16px;">📝 Solution:</h3>
+                    <div>${answer.replace(/\n/g, '<br>')}</div>
+                </div>
+            `;
+
+            showLoading(false);
+        };
+
+        window.sendMessage = async function() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML += `<div class="chat-message user"><div class="message-bubble">${message}</div></div>`;
+
+            input.value = '';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            showLoading(true);
+
+            const reply = await callAI([
+                { role: 'system', content: 'You are a loving AI girlfriend. Reply in 1-2 sentences with emojis.' },
+                { role: 'user', content: message }
+            ], 100);
+
+            chatContainer.innerHTML += `<div class="chat-message ai"><div class="message-bubble">${reply}</div></div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            showLoading(false);
+        };
+
+        window.generateCaption = async function() {
+            const topic = document.getElementById('captionTopic').value.trim();
+            const tone = document.getElementById('captionTone').value;
+            if (!topic) return alert('Describe post');
+
+            showLoading(true);
+
+            const captions = await callAI([
+                { role: 'system', content: `Generate 3 ${tone} Instagram captions with emojis.` },
+                { role: 'user', content: topic }
+            ], 300);
+
+            document.getElementById('captionResult').innerHTML = `
+                <div class="result-box">
+                    <h3 style="color: var(--primary); margin-bottom: 16px;">✨ Captions:</h3>
+                    <div>${captions.replace(/\n/g, '<br><br>')}</div>
+                </div>
+            `;
+
+            showLoading(false);
+        };
+
+        window.paraphraseText = async function() {
+            const text = document.getElementById('paraphraseText').value.trim();
+            if (!text) return alert('Enter text');
+
+            showLoading(true);
+
+            const result = await callAI([
+                { role: 'system', content: 'Rewrite uniquely keeping same meaning.' },
+                { role: 'user', content: text }
+            ], 800);
+
+            document.getElementById('paraphraseResult').innerHTML = `
+                <div class="result-box">
+                    <h3 style="color: var(--primary); margin-bottom: 16px;">🔄 Paraphrased:</h3>
+                    <div>${result}</div>
+                </div>
+            `;
+
+            showLoading(false);
+        };
+
+        window.checkGrammar = async function() {
+            const text = document.getElementById('grammarText').value.trim();
+            if (!text) return alert('Enter text');
+
+            showLoading(true);
+
+            const result = await callAI([
+                { role: 'system', content: 'Check grammar. Provide corrected text.' },
+                { role: 'user', content: text }
+            ], 800);
+
+            document.getElementById('grammarResult').innerHTML = `
+                <div class="result-box">
+                    <h3 style="color: var(--success); margin-bottom: 16px;">✅ Corrected:</h3>
+                    <div>${result.replace(/\n/g, '<br>')}</div>
+                </div>
+            `;
+
+            showLoading(false);
+        };
+
+        window.generateQR = function() {
+            const text = document.getElementById('qrText').value.trim();
+            if (!text) return alert('Enter text');
+
+            document.getElementById('qrcode').innerHTML = `
+                <div style="width: 200px; height: 200px; background: white; border: 2px solid #000; display: flex; align-items: center; justify-content: center; color: #000; padding: 20px; text-align: center;">
+                    QR for:<br>${text.substring(0, 30)}...
+                </div>
+            `;
+        };
+
+        window.generateResume = function() {
+            const name = document.getElementById('resumeName').value.trim();
+            const email = document.getElementById('resumeEmail').value.trim();
+            const phone = document.getElementById('resumePhone').value.trim();
+            const summary = document.getElementById('resumeSummary').value.trim();
+            const skills = document.getElementById('resumeSkills').value.trim();
+
+            if (!name || !email || !summary) return alert('Fill required fields');
+
+            document.getElementById('resumePreview').innerHTML = `
+                <div class="resume-preview">
+                    <h2 style="color: var(--primary); margin-bottom: 8px;">${name}</h2>
+                    <p style="margin-bottom: 20px;">${email} | ${phone}</p>
+                    <section>
+                        <h3>Professional Summary</h3>
+                        <p>${summary}</p>
+                    </section>
+                    <section>
+                        <h3>Skills</h3>
+                        <p>${skills.split(',').map(s => s.trim()).join(' • ')}</p>
+                    </section>
+                </div>
+            `;
+        };
+
+        window.generatePalette = function() {
+            const palette = document.getElementById('colorPalette');
+            palette.innerHTML = '';
+
+            for (let i = 0; i < 5; i++) {
+                const color = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+                const box = document.createElement('div');
+                box.className = 'color-box';
+                box.style.background = color;
+                box.textContent = color;
+                box.style.color = isLight(color) ? '#000' : '#fff';
+                box.onclick = () => {
+                    navigator.clipboard.writeText(color);
+                    alert('Copied: ' + color);
+                };
+                palette.appendChild(box);
+            }
+        };
+
+        function isLight(color) {
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substr(0,2), 16);
+            const g = parseInt(hex.substr(2,2), 16);
+            const b = parseInt(hex.substr(4,2), 16);
+            return ((r * 299) + (g * 587) + (b * 114)) / 1000 > 128;
+        }
+
+        async function loadUserStats() {
+            const userRef = ref(database, `users/${window.currentUser.uid}`);
+            const snapshot = await get(userRef);
+            const data = snapshot.val();
+
+            document.getElementById('userToolsUsed').textContent = data.toolsUsed || 0;
+            document.getElementById('userAccessCount').textContent = data.accessCount || 0;
+            
+            const joinDate = new Date(data.createdAt).toLocaleDateString();
+            document.getElementById('memberSince').textContent = joinDate;
+
+            const initial = window.currentUser.email.charAt(0).toUpperCase();
+            document.getElementById('profileAvatar').textContent = initial;
+            document.getElementById('profileEmail').textContent = window.currentUser.email;
+        }
+
+        function addAdminNav() {
+            const nav = document.querySelector('.bottom-nav');
+            if (!document.getElementById('adminNav')) {
+                nav.innerHTML += `
+                    <div class="nav-item" id="adminNav" onclick="switchPage('admin')">
+                        <div class="nav-icon">👑</div>
+                        <div class="nav-label">Admin</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadAdminStats() {
+            const usersRef = ref(database, 'users');
+            const snapshot = await get(usersRef);
+            if (!snapshot.exists()) return;
+
+            const users = snapshot.val();
+            const userArray = Object.values(users);
+
+            document.getElementById('adminTotalUsers').textContent = userArray.length;
+            document.getElementById('adminActiveAccess').textContent = userArray.filter(u => u.accessExpiry > Date.now()).length;
+            
+            const today = new Date().setHours(0,0,0,0);
+            document.getElementById('adminTodaySignups').textContent = userArray.filter(u => u.createdAt >= today).length;
+
+            const revenue = userArray.reduce((sum, u) => sum + (u.accessCount || 0), 0);
+            document.getElementById('adminRevenue').textContent = '₹' + revenue;
+
+            const list = document.getElementById('adminUserList');
+            list.innerHTML = '';
+
+            userArray.slice(0, 10).forEach(user => {
+                const hours = Math.floor(Math.max(0, user.accessExpiry - Date.now()) / (1000 * 60 * 60));
+                
+                list.innerHTML += `
+                    <div class="user-item">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <div style="font-weight: 600;">${user.email}</div>
+                                <div style="font-size: 12px; color: var(--text-dim);">
+                                    Tools: ${user.toolsUsed || 0} | Access: ${user.accessCount || 0}
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: ${hours > 0 ? 'var(--success)' : 'var(--danger)'};">
+                                ${hours}h left
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('active', show);
+        }
+
+        function showAlert(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        updateRecentUnlocks();
+    </script>
+</body>
+</html>

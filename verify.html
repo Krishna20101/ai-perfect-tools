@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying Access...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0f1e, #1a1a2e);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(37, 37, 64, 0.8);
+            border-radius: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 30px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .icon.show {
+            display: block;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        p {
+            opacity: 0.7;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .success {
+            color: #10b981;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
+        .redirect-msg {
+            margin-top: 20px;
+            font-size: 12px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner" id="spinner"></div>
+        <div class="icon" id="icon"></div>
+        <h1 id="message">Verifying your access...</h1>
+        <p id="submessage">Please wait while we process your request...</p>
+        <div class="redirect-msg" id="redirect"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtz-6L1G66Tp6YaC8UBHyaLpZkMYpb3Zs",
+            authDomain: "ai-perfect-tools.firebaseapp.com",
+            databaseURL: "https://ai-perfect-tools-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ai-perfect-tools",
+            storageBucket: "ai-perfect-tools.firebasestorage.app",
+            messagingSenderId: "310354907491",
+            appId: "1:310354907491:web:3bd0d5f184f6fe9a18c356"
+        };
+
+        const app = initializeApp(firebaseConfig);
+
+        async function verify() {
+            const params = new URLSearchParams(window.location.search);
+            const uid = params.get('uid');
+            const token = params.get('token');
+
+            if (!uid || !token) {
+                showError('Invalid verification link', 'Link is missing required parameters.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: uid, token: token })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess();
+                } else {
+                    showError(data.message || 'Verification failed', 'Please try generating a new link.');
+                }
+
+            } catch (error) {
+                console.error('Verification error:', error);
+                showError('Verification failed', 'Network error. Please check your connection and try again.');
+            }
+        }
+
+        function showSuccess() {
+            document.getElementById('spinner').style.display = 'none';
+            
+            const icon = document.getElementById('icon');
+            icon.textContent = '✅';
+            icon.classList.add('show');
+            
+            document.getElementById('message').textContent = 'Success!';
+            document.getElementById('message').className = 'success';
+            document.getElementById('submessage').textContent = '24 hours unlimited access has been added to your account!';
+            document.getElementById('redirect').textContent = 'Redirecting you back to the app...';
+            
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        }
+
+        function showError(title, msg) {
+            document.getElementById('spinner').style.display = 'none';
+            
+            const icon = document.getElementById('icon');
+            icon.textContent = '❌';
+            icon.classList.add('show');
+            
+            document.getElementById('message').textContent = title;
+            document.getElementById('message').className = 'error';
+            document.getElementById('submessage').textContent = msg;
+            document.getElementById('redirect').textContent = 'You can close this window.';
+        }
+
+        verify();
+    </script>
+</body>
+</html>

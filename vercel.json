@@ -4,41 +4,12 @@
     {
       "src": "api/**/*.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/api/ai",
-      "dest": "/api/ai.js",
-      "methods": ["POST", "OPTIONS"]
-    },
-    {
-      "src": "/api/shortlink",
-      "dest": "/api/shortlink.js",
-      "methods": ["POST", "OPTIONS"]
-    },
-    {
-      "src": "/api/verify",
-      "dest": "/api/verify.js",
-      "methods": ["POST", "OPTIONS"]
-    },
-    {
-      "src": "/verify.html",
-      "dest": "/verify.html"
-    },
-    {
-      "src": "/",
-      "dest": "/index.html"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     }
-  ],
-  "env": {
-    "FIREBASE_PROJECT_ID": "ai-perfect-tools",
-    "FIREBASE_CLIENT_EMAIL": "",
-    "FIREBASE_PRIVATE_KEY": "",
-    "PERPLEXITY_API_KEY": ""
-  }
+  ]
 }
